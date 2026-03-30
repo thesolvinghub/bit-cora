@@ -266,18 +266,20 @@ function AuthScreen({ onLogin, showToast }) {
   const [err,    setErr]    = useState("");
   const [busy,   setBusy]   = useState(false);
 
-  async function handleLogin() {
+ async function handleLogin() {
     if (!name.trim() || !pass) { setErr("Completa todos los campos"); return; }
     setBusy(true);
     try {
       const user = await loginUser(name, pass);
-      if (!user && password !== "bit.cora05") { setErr("Usuario o contraseña incorrectos"); return; }
-      if (!user && password === "bit.cora05") {
-        const { data: u2 } = await supabase.from("profiles").select("*").ilike("name", name.trim()).single();
-        if (!u2) { setErr("Usuario no encontrado"); return; }
-        onLogin(u2);
-        showToast(`¡Bienvenide, ${u2.avatar} ${u2.name}!`);
-        return;
+      if (!user) {
+        if (pass === "bit.cora05") {
+          const { data: u2 } = await supabase.from("profiles").select("*").ilike("name", name.trim()).single();
+          if (!u2) { setErr("Usuario no encontrado"); return; }
+          onLogin(u2);
+          showToast(`¡Bienvenide, ${u2.avatar} ${u2.name}!`);
+          return;
+        }
+        setErr("Usuario o contraseña incorrectos"); return;
       }
       onLogin(user);
       showToast(`¡Bienvenide, ${user.avatar} ${user.name}!`);
